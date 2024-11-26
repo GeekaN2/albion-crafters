@@ -1,9 +1,9 @@
-import { MARKET_ORDER_FEE, MARKET_SELL_ORDER_FEE } from './constants';
+import { PRODUCTION_BONUS_BY_CITY, MARKET_ORDER_FEE, MARKET_SELL_ORDER_FEE } from './constants';
 import { ResponseModel, Item } from './profit-tree/typeDefs'
 
 /**
  * Define type of item: journal, item, artifact, resource etc.
- * 
+ *
  * @param itemName resource or artifact name: T4_PLANK, T7_ARTEFACT_MAIN_SPEAR_KEEPER etc.
  * @returns array with all tiers and subtiers for this item
  */
@@ -30,7 +30,7 @@ export function createArrayOfAllIngredients(itemName: string): string[] {
 
 /**
  * Creates a string to request for items of all tiers and subtiers
- * 
+ *
  * @param itemName - item name: T4_2H_NATURESTAFF_KEEPER etc.
  * @returns string with all tiers and subtiers for item
  */
@@ -48,7 +48,7 @@ export function createStringOfAllItems(itemName: string): string {
 
 /**
  * Creates a string to request for materials of all tiers and subtiers
- * 
+ *
  * @param resource - basic resource: PLANKS, CLOTH etc.
  * @returns string with all tiers and subtiers for materials
  */
@@ -70,7 +70,7 @@ export function createStringOfAllResources(resource: string, startTier = 4): str
 
 /**
  * Creates a string to request for artefacts of all tiers
- * 
+ *
  * @param itemName - artefact item name: T4_2H_NATURESTAFF_KEEPER etc.
  * @returns string with all tiers for artefacts
  */
@@ -109,7 +109,7 @@ export function createStringOfAllArtifacts(itemName: string) {
 
 /**
  * Creates an array to request for artefacts of all tiers
- * 
+ *
  * @param itemName - artefact item name: T4_ARTEFACT_2H_NATURESTAFF_KEEPER etc.
  * @returns array with all tiers for artefacts
  */
@@ -147,7 +147,7 @@ export function createArrayOfAllArtifactsFromArtifact(artifactName: string) {
 
 /**
  * Creates a string to request for empty and full journals of all tiers and subtiers
- * 
+ *
  * @param root - journals branch: ROOT_WARRIOR etc.
  * @returns string with all tiers and subtiers for empty and full journals
  */
@@ -207,8 +207,8 @@ export function getHeartNameByItemName(itemName: string): string {
 
 /**
  * Minimum price from sales orders or maximum price from purchase orders
- * 
- * @param {ResponseModel} item 
+ *
+ * @param {ResponseModel} item
  */
 export function normalizedPriceAndDate(item: ResponseModel): Item {
   const previousDay = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -258,9 +258,9 @@ export function normalizedPriceAndDate(item: ResponseModel): Item {
 /**
  * Normalize previous item and new item by date and price
  * Trying to choose the most expensive item
- * 
+ *
  * @param oldItem - previous item
- * @param newItem - new item 
+ * @param newItem - new item
  */
 export function normalizeItemByDate(oldItem: Item, newItem: Item) {
   const previousDay = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -275,11 +275,11 @@ export function normalizeItemByDate(oldItem: Item, newItem: Item) {
 }
 
 /**
- * Normalize previous item and new item by date and price 
+ * Normalize previous item and new item by date and price
  * Trying to choose the most cheap item
- * 
+ *
  * @param oldItem - previous item
- * @param newItem - new item 
+ * @param newItem - new item
  */
 export function normalizeByMinPriceAndDate(oldItem: Item, newItem: Item) {
   const previousDay = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -322,7 +322,7 @@ export function normalizeItemsByMaxPriceFromMinPrices(prices: ResponseModel[]) {
 
 /**
  * Normalize prices use only sellPriceMin
- * 
+ *
  * @param prices - array of items
  */
 export function normalizeItemBySellPriceMin(prices: ResponseModel[]) {
@@ -356,7 +356,7 @@ export function normalizeItemBySellPriceMin(prices: ResponseModel[]) {
 
 /**
  * Checking an object for emptiness
- * 
+ *
  * @param obj - any object
  */
 export function isObjectEmpty(obj: object): boolean {
@@ -365,12 +365,12 @@ export function isObjectEmpty(obj: object): boolean {
 
 /**
  * Looking for an artifact substring in an item name
- * 
+ *
  * @param itemName - item name: T4_HEAD_CLOTH_HELL etc.
  */
 export function isArtifactItem(itemName: string, excludeRoyal?: boolean): boolean {
   const artifacts = ['UNDEAD', 'KEEPER', 'HELL', 'MORGANA', 'AVALON', 'FEY', "INSIGHT", "CAPEITEM"];
-  
+
   if (!excludeRoyal) {
     artifacts.push('ROYAL');
   }
@@ -384,7 +384,7 @@ export function isArtifactItem(itemName: string, excludeRoyal?: boolean): boolea
 
 /**
  * Looking for an artifact substring in an item name
- * 
+ *
  * @param itemName - item name: T4_ARTEFACT_HEAD_CLOTH_HELL etc.
  */
 export function isArtifact(itemName: string): boolean {
@@ -395,7 +395,7 @@ export function isArtifact(itemName: string): boolean {
 
 /**
  * Determine the raw material for creating the material
- * 
+ *
  * @param material - material name
  */
 export function getRawResourceNameByMaterial(material: string): string {
@@ -412,7 +412,7 @@ export function getRawResourceNameByMaterial(material: string): string {
 
 /**
  * Small function to help in subtier names generation
- * 
+ *
  * @param baseName - item name without a subtier
  * @param highestSubtier - bound of subtiers
  */
@@ -428,7 +428,7 @@ export const generateSubtiersUpTo = (baseName: string, highestSubtier: number) =
 
 /**
  * Small function to help in tier names generation
- * 
+ *
  * @param baseName - item name without a tier, e.g. RUNE
  */
 export const generateTiers = (baseName: string): string[] => {
@@ -446,7 +446,7 @@ export const generateTiers = (baseName: string): string[] => {
  * @param objects - array of sorted object by field
  * @param field - field name by which objects are sorted
  * @param value - field value to find
- * @returns 
+ * @returns
  */
 export const lowerBoundForObjects = <ObjectType>(
   objects: ObjectType[],
@@ -477,7 +477,7 @@ export const lowerBoundForObjects = <ObjectType>(
 
 /**
  * O(log2n) search by objects
- * 
+ *
  * @param objects - array of sorted object by field
  * @param field - field name by which objects are sorted
  * @param value - field value to find
@@ -515,7 +515,7 @@ export const getItemTierByName = (itemName: string) => {
 
   if (itemName.includes('QUESTITEM_TOKEN_AVALON')) {
     return 6;
-  } 
+  }
 
   return tier ? Number(tier.slice(1)) : 0;
 }
@@ -528,4 +528,12 @@ export const getItemSubtierByName = (itemName: string) => {
   }
 
   return Number(subtier.slice(1)) || 0;
+}
+
+export const getProductionBonusCityByItem = (item: string) => {
+  return Object.entries(PRODUCTION_BONUS_BY_CITY).find(([_, items]) => items.some(keyword => item.includes(keyword)))?.[0];
+}
+
+export const getDoesItemHaveProductionBonusForCity = (item: string, city: string) => {
+  return getProductionBonusCityByItem(item) === city;
 }

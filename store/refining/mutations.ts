@@ -1,13 +1,13 @@
 import { MutationTree } from 'vuex'
 import { Features, RefiningState } from './typeDefs'
 import { ResponseModel, SettingsWithItem, ItemInfo, OneOfCitiesProp } from './typeDefs'
-import { getRawResourceNameByMaterial } from '../utils';
+import { getProductionBonusCityByItem, getRawResourceNameByMaterial } from '../utils';
 import Vue from 'vue';
 
 export const mutations: MutationTree<RefiningState> = {
   /**
    * Set json files data into state
-   * 
+   *
    * @param state - vuex state
    */
   SET_STATE(state) {
@@ -34,20 +34,33 @@ export const mutations: MutationTree<RefiningState> = {
 
   /**
    * Set information about selected material
-   * 
+   *
    * @param state - vuex state
    * @param itemInfo - material info
    */
   SET_ITEM_INFO(state, itemInfo: ItemInfo) {
     state.currentItemInfo = itemInfo;
+    const productionBonusCity = getProductionBonusCityByItem(itemInfo.name);
+
+    if (productionBonusCity) {
+      if (state.settings.useMultipleCities) {
+        state.settings.cities.refiningResources = productionBonusCity;
+      } else {
+      state.settings.cities = {
+        sellMaterials: productionBonusCity,
+        refiningResources: productionBonusCity,
+        buyMaterials: productionBonusCity,
+        buyRawResources: productionBonusCity
+      }}
+    }
   },
 
   /**
    * Set raw resources prices to state
-   * 
+   *
    * @param state - vuex state
    * @param data - api response
-   * @param settingsWithItem - сonvenient item data and settings 
+   * @param settingsWithItem - сonvenient item data and settings
    */
   SET_RAW_RESOURCES(state, { data, settingsWithItem }: { data: ResponseModel[], settingsWithItem: SettingsWithItem}) {
     const itemName = getRawResourceNameByMaterial(settingsWithItem.currentItemInfo.name);
@@ -58,10 +71,10 @@ export const mutations: MutationTree<RefiningState> = {
 
   /**
    * Set material prices where we sell them
-   * 
+   *
    * @param state - vuex state
    * @param data - api response
-   * @param settingsWithItem - сonvenient item data and settings 
+   * @param settingsWithItem - сonvenient item data and settings
    */
   SET_SELL_MATERIALS(state, { data, settingsWithItem }: { data: ResponseModel[], settingsWithItem: SettingsWithItem}) {
     const itemName = settingsWithItem.currentItemInfo.name;
@@ -72,10 +85,10 @@ export const mutations: MutationTree<RefiningState> = {
 
   /**
    * Set material prices where we buy them
-   * 
+   *
    * @param state - vuex state
    * @param data - api response
-   * @param settingsWithItem - сonvenient item data and settings 
+   * @param settingsWithItem - сonvenient item data and settings
    */
   SET_BUY_MATERIALS(state, { data, settingsWithItem }: { data: ResponseModel[], settingsWithItem: SettingsWithItem}) {
     const itemName = settingsWithItem.currentItemInfo.name;
@@ -90,7 +103,7 @@ export const mutations: MutationTree<RefiningState> = {
 
   /**
    * Update use focus param
-   * 
+   *
    * @param state - vuex state
    * @param useFocus - use focus points or not
    */
@@ -100,7 +113,7 @@ export const mutations: MutationTree<RefiningState> = {
 
   /**
    * Update craft fee
-   * 
+   *
    * @param state - vuex state
    * @param fee - craft fee
    */
@@ -114,7 +127,7 @@ export const mutations: MutationTree<RefiningState> = {
 
   /**
    * Update use own return percentage param
-   * 
+   *
    * @param state - vuex state
    * @param useOwnPercentage - use own return percentage or not
    */
@@ -124,7 +137,7 @@ export const mutations: MutationTree<RefiningState> = {
 
   /**
    * Update own return percentage
-   * 
+   *
    * @param state - vuex state
    * @param returnPercentage - own return percentage
    */
@@ -134,7 +147,7 @@ export const mutations: MutationTree<RefiningState> = {
 
   /**
    * Set loading text
-   * 
+   *
    * @param state - vuex state
    * @param loadingText - text of loading
    */
@@ -142,13 +155,13 @@ export const mutations: MutationTree<RefiningState> = {
     state.features.loadingText = loadingText;
   },
 
-  UPDATE_ITEM_BY_ITEM_NAME(state, { 
-    itemName, 
-    item, 
+  UPDATE_ITEM_BY_ITEM_NAME(state, {
+    itemName,
+    item,
     itemGroup,
-  }: { 
-    itemName: string; 
-    item: ResponseModel, 
+  }: {
+    itemName: string;
+    item: ResponseModel,
     itemGroup: 'sellMaterials' | 'buyMaterials' | 'buyRawResources',
   }) {
     const currentItemInfo = state.currentItemInfo;

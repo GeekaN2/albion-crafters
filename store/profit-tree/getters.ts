@@ -1,17 +1,18 @@
 import { GetterTree } from 'vuex'
-import { TreeState, Item, Recipes, Recipe } from './typeDefs'
+import { TreeState, Item, Recipe } from './typeDefs'
 import {
   isArtifactItem,
   normalizeItemsByMaxPriceFromMinPrices,
   normalizeItemBySellPriceMin,
   getHeartNameByItemName,
+  getDoesItemHaveProductionBonusForCity,
 } from '../utils'
 import cloneDeep from 'lodash.clonedeep';
 
 export const getters: GetterTree<TreeState, {}> = {
   /**
    * Get t4-t8 item prices
-   * 
+   *
    * @param state - vuex state
    */
   getItems: (state: TreeState) => {
@@ -35,7 +36,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
   /**
    * Get artefact
-   * 
+   *
    * @param state - vuex state
    */
   getArtefacts: (state: TreeState) => {
@@ -48,7 +49,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
   /**
    * Get item craft recipe
-   * 
+   *
    * @param state - vuex state
    */
   getRecipe: (state: TreeState) => {
@@ -60,7 +61,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
   /**
    * Get resource prices for current city
-   * 
+   *
    * @param state - vuex state
    */
   getFirstResources: (state: TreeState) => {
@@ -72,7 +73,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
   /**
    * Get resource prices for current city
-   * 
+   *
    * @param state - vuex state
    */
   getSecondResources: (state: TreeState) => {
@@ -84,7 +85,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
   /**
    * Get empty journal prices for current city and root
-   * 
+   *
    * @param state - vuex state
    */
   getEmptyJournals: (state: TreeState) => {
@@ -99,7 +100,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
   /**
    * Get full journal prices for current city and root
-   * 
+   *
    * @param state - vuex state
    */
   getFullJournals: (state: TreeState) => {
@@ -114,7 +115,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
   /**
    * Get average data: average price and average number of items sold per day
-   * 
+   *
    * @param state - vuex state
    */
   getAverageData: (state: TreeState) => {
@@ -127,7 +128,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
   /**
    * Heart prices
-   * 
+   *
    * @param state - vuex state
    */
   getHearts: (state: TreeState, getters: GetterTree<TreeState, {}>) => {
@@ -142,7 +143,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
   /**
    * Hearts of cities for some special items such as capes
-   * 
+   *
    * @param state - vuex state
    */
   areHeartsNeeded: (state: TreeState): boolean => {
@@ -151,13 +152,13 @@ export const getters: GetterTree<TreeState, {}> = {
 
   getHeartName: (state: TreeState): string => {
     const itemName = state.currentItemInfo.name;
-  
+
     return getHeartNameByItemName(itemName);
   },
 
   /**
    * Get text of loading
-   * 
+   *
    * @param state - vuex state
    */
   loadingText: (state: TreeState) => {
@@ -166,7 +167,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
   /**
    * Is all neccessary data loaded
-   * 
+   *
    * @param state - vuex state
    */
   isLoaded: (state: TreeState) => {
@@ -174,7 +175,7 @@ export const getters: GetterTree<TreeState, {}> = {
   },
 
   /**
-   * Returns the percentage of materials returned 
+   * Returns the percentage of materials returned
    * for profile cities
    */
   returnMaterialPercentage: (state: TreeState): number => {
@@ -187,45 +188,18 @@ export const getters: GetterTree<TreeState, {}> = {
     const city = state.settings.cities.craftItems;
     const useFocus = state.settings.useFocus;
 
-    let returnMaterialsPercentage = useFocus ? 43.5 : 15.2;
+    const hasProductionBonus = getDoesItemHaveProductionBonusForCity(city === 'Caerleon' ? itemName : parentItem, city);
 
-    // Keywords for the category of items that the bonus is assigned to
-    const bonus: { [key: string]: string[] } = {
-      'Caerleon': ['TOOL', 'KNUCKLES'],
-      'Martlock': ['AXE', 'QUARTERSTAFF', 'FROSTSTAFF', 'SHOES_PLATE', 'OFF'],
-      'Bridgewatch': ['CROSSBOW', 'DAGGER', 'CURSEDSTAFF', 'ARMOR_PLATE', 'SHOES_CLOTH'],
-      'Lymhurst': ['SWORD', 'BOW', 'ARCANESTAFF', 'HEAD_LEATHER', 'SHOES_LEATHER'],
-      'Fort Sterling': ['HAMMER', 'SPEAR', 'HOLYSTAFF', 'HEAD_PLATE', 'ARMOR_CLOTH'],
-      'Thetford': ['MACE', 'NATURESTAFF', 'FIRESTAFF', 'ARMOR_LEATHER', 'HEAD_CLOTH'],
-      'Brecilien': ['CAPE', 'BAG'], // and also potions
-    };
-
-    if (!bonus[city]) {
-      return returnMaterialsPercentage;
+    if (hasProductionBonus) {
+      return useFocus ? 47.9 : 24.8
+    } else {
+      return useFocus ? 43.5 : 15.2;
     }
-
-    const categories = bonus[city];
-
-    let addBonus = categories.some(keyword => {
-      return parentItem.includes(keyword);
-    });
-
-    if (city == 'Caerleon') {
-      addBonus = categories.some(keyword => {
-        return itemName.includes(keyword);
-      });
-    }
-
-    if (addBonus) {
-      returnMaterialsPercentage = useFocus ? 47.9 : 24.8;
-    }
-
-    return returnMaterialsPercentage;
   },
 
   /**
    * Is the current item an artifact?
-   * 
+   *
    * @param state - vuex state
    */
   isArtifactItem: (state: TreeState): boolean => {
@@ -235,7 +209,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
   /**
    * Get an artifact name
-   * 
+   *
    * @param state - vuex state
    * @param getters - vuex getters
    * @param tier - tier of artifact to return
@@ -262,7 +236,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
   /**
    * Get journal name of current item neede tier
-   * @param state 
+   * @param state
    */
   getJournalName: (state: TreeState) => (tier: number): string => {
     return `T${tier}_JOURNAL${state.currentItemInfo.root.slice(4)}`
@@ -283,7 +257,7 @@ export const getters: GetterTree<TreeState, {}> = {
 
       let index = 0;
       let maxCraftedItems = 0;
-      
+
       while (getSeriesValue(index) > 0 && isFinite(getSeriesValue(index))) {
         maxCraftedItems += getSeriesValue(index);
 
@@ -334,9 +308,9 @@ export const getters: GetterTree<TreeState, {}> = {
       if (!numberOfMaterials) {
         continue;
       }
-  
+
       recipe[key as keyof Recipe] = numberOfMaterials * numberOfRequiredItems;
-    } 
+    }
 
     return recipe || {};
   }
